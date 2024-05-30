@@ -36,4 +36,4 @@ Please fork this repository and develop a real estate property search feature us
 
 **Given** a large number of fake properties (10,000, 100,000, and 1,000,000),  
 **When** the search is performed,  
-**Then** the query performance should meet acceptable performance benchmarks.  
+**Then** the query performance should meet acceptable performance benchmarks.   
