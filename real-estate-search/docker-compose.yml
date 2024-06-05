@@ -1,26 +1,27 @@
-version: '3.7'
+version: '3.8'
 
 services:
   mysql:
-    image: mysql:5.7
-    container_name: real-estate-mysql
+    image: mysql:8
     environment:
       MYSQL_ROOT_PASSWORD: naylinn123
       MYSQL_DATABASE: real_estate
     ports:
-      - "3307:3306"  # Change the host port to 3307
+      - "3306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
 
-  nextjs:
-    image: node:14
-    container_name: real-estate-nextjs
-    working_dir: /app
-    volumes:
-      - ./:/app
+  web:
+    build: .
+    environment:
+      - MYSQL_HOST=localhost
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=naylinn123
+      - MYSQL_DATABASE=real_estate
     ports:
       - "3000:3000"
-    command: sh -c "npm install && npm run dev"
+    depends_on:
+      - mysql
 
 volumes:
   mysql-data:

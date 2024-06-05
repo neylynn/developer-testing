@@ -7,20 +7,21 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "generate-fake-data": "node scripts/generate-fake-data.js"
+    "generate-fake-data": "node server/generateFakeData.js",
+    "server": "node server/server.js"
   },
   "dependencies": {
     "@apollo/client": "^3.10.4",
+    "@apollo/server": "^4.10.4",
     "@faker-js/faker": "^8.4.1",
     "apollo-server-micro": "^3.13.0",
     "graphql": "^16.8.1",
-    "mysql2": "^3.10.0",
+    "graphql-tag": "^2.12.6",
+    "mysql2": "^2.3.3",
     "next": "14.2.3",
     "react": "^18",
     "react-dom": "^18",
-    "react-slick": "^0.30.2",
-    "sequelize": "^6.37.3",
-    "slick-carousel": "^1.8.1"
+    "sequelize": "^6.6.5"
   },
   "devDependencies": {
     "@types/node": "^20",

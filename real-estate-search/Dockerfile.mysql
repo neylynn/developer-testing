@@ -1,0 +1,13 @@
+# Dockerfile.mysql
+
+# Use official MySQL image as the base image
+FROM mysql:latest
+
+# Set root password
+ENV MYSQL_ROOT_PASSWORD naylinn123
+
+# Create database
+ENV MYSQL_DATABASE real_estate
+
+# Expose MySQL port
+EXPOSE 3306

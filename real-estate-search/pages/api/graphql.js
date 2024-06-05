@@ -1,43 +1,45 @@
 import { ApolloServer, gql } from 'apollo-server-micro';
-import Property from '../../models/property';
+import { listings } from '../../data'; // Assuming you have some data or database connection
 
 const typeDefs = gql`
-  type Property {
+  type Listing {
     id: ID!
-    name: String!
-    title: String!
+    projectName: String!
+    shortTitle: String!
     price: Float!
     bedrooms: Int!
     area: Float!
-    description: String!
-    images: [String]!
-    saleOrRent: String!
+    shortDescription: String!
+    images: [String!]!
   }
 
   type Query {
-    properties(
-      saleOrRent: String,
-      minPrice: Float,
-      maxPrice: Float,
-      bedrooms: Int,
-      minArea: Float,
+    listings(
+      saleOrRent: String
+      minPrice: Float
+      maxPrice: Float
+      minBedrooms: Int
+      maxBedrooms: Int
+      minArea: Float
       maxArea: Float
-    ): [Property]
+    ): [Listing!]!
   }
 `;
 
 const resolvers = {
   Query: {
-    properties: async (_, args) => {
-      const { saleOrRent, minPrice, maxPrice, bedrooms, minArea, maxArea } = args;
-      let where = {};
-      if (saleOrRent) where.saleOrRent = saleOrRent;
-      if (minPrice !== undefined) where.price = { [Op.gte]: minPrice };
-      if (maxPrice !== undefined) where.price = { [Op.lte]: maxPrice };
-      if (bedrooms !== undefined) where.bedrooms = bedrooms;
-      if (minArea !== undefined) where.area = { [Op.gte]: minArea };
-      if (maxArea !== undefined) where.area = { [Op.lte]: maxArea };
-      return await Property.findAll({ where });
+    listings: (_, args) => {
+      // Filter logic here
+      return listings.filter(listing => {
+        if (args.saleOrRent && listing.saleOrRent !== args.saleOrRent) return false;
+        if (args.minPrice && listing.price < args.minPrice) return false;
+        if (args.maxPrice && listing.price > args.maxPrice) return false;
+        if (args.minBedrooms && listing.bedrooms < args.minBedrooms) return false;
+        if (args.maxBedrooms && listing.bedrooms > args.maxBedrooms) return false;
+        if (args.minArea && listing.area < args.minArea) return false;
+        if (args.maxArea && listing.area > args.maxArea) return false;
+        return true;
+      });
     }
   }
 };
