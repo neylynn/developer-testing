@@ -1,5 +1,8 @@
 import { ApolloServer, gql } from 'apollo-server-micro';
-import { listings } from '../../data'; // Assuming you have some data or database connection
+import fs from 'fs';
+import path from 'path';
+
+const properties = JSON.parse(fs.readFileSync(path.resolve('./data/properties.json'), 'utf8'));
 
 const typeDefs = gql`
   type Listing {
@@ -10,6 +13,7 @@ const typeDefs = gql`
     bedrooms: Int!
     area: Float!
     shortDescription: String!
+    saleOrRent: String!
     images: [String!]!
   }
 
@@ -29,27 +33,49 @@ const typeDefs = gql`
 const resolvers = {
   Query: {
     listings: (_, args) => {
-      // Filter logic here
-      return listings.filter(listing => {
-        if (args.saleOrRent && listing.saleOrRent !== args.saleOrRent) return false;
-        if (args.minPrice && listing.price < args.minPrice) return false;
-        if (args.maxPrice && listing.price > args.maxPrice) return false;
-        if (args.minBedrooms && listing.bedrooms < args.minBedrooms) return false;
-        if (args.maxBedrooms && listing.bedrooms > args.maxBedrooms) return false;
-        if (args.minArea && listing.area < args.minArea) return false;
-        if (args.maxArea && listing.area > args.maxArea) return false;
-        return true;
-      });
-    }
-  }
+      let filteredProperties = properties;
+
+      if (args.saleOrRent) {
+        filteredProperties = filteredProperties.filter(property => property.saleOrRent === args.saleOrRent);
+      }
+      if (args.minPrice) {
+        filteredProperties = filteredProperties.filter(property => property.price >= args.minPrice);
+      }
+      if (args.maxPrice) {
+        filteredProperties = filteredProperties.filter(property => property.price <= args.maxPrice);
+      }
+      if (args.minBedrooms) {
+        filteredProperties = filteredProperties.filter(property => property.bedrooms >= args.minBedrooms);
+      }
+      if (args.maxBedrooms) {
+        filteredProperties = filteredProperties.filter(property => property.bedrooms <= args.maxBedrooms);
+      }
+      if (args.minArea) {
+        filteredProperties = filteredProperties.filter(property => property.area >= args.minArea);
+      }
+      if (args.maxArea) {
+        filteredProperties = filteredProperties.filter(property => property.area <= args.maxArea);
+      }
+
+      return filteredProperties;
+    },
+  },
 };
 
 const apolloServer = new ApolloServer({ typeDefs, resolvers });
 
 export const config = {
   api: {
-    bodyParser: false
-  }
+    bodyParser: false,
+  },
 };
 
-export default apolloServer.createHandler({ path: '/api/graphql' });
+let serverStartPromise;
+
+export default async function handler(req, res) {
+  if (!serverStartPromise) {
+    serverStartPromise = apolloServer.start();
+  }
+  await serverStartPromise;
+  return apolloServer.createHandler({ path: '/api/graphql' })(req, res);
+}

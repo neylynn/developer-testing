@@ -1,25 +1,24 @@
-import { useState, useEffect } from 'react';
 import { useLazyQuery, gql } from '@apollo/client';
+import { useState } from 'react';
 import Layout from '../components/Layout';
 
-// GraphQL query with additional filter parameters
 const LISTINGS_QUERY = gql`
   query Listings(
-    $saleOrRent: String,
-    $minPrice: Float,
-    $maxPrice: Float,
-    $minBedrooms: Int,
-    $maxBedrooms: Int,
-    $minArea: Float,
+    $saleOrRent: String
+    $minPrice: Float
+    $maxPrice: Float
+    $minBedrooms: Int
+    $maxBedrooms: Int
+    $minArea: Float
     $maxArea: Float
   ) {
     listings(
-      saleOrRent: $saleOrRent,
-      minPrice: $minPrice,
-      maxPrice: $maxPrice,
-      minBedrooms: $minBedrooms,
-      maxBedrooms: $maxBedrooms,
-      minArea: $minArea,
+      saleOrRent: $saleOrRent
+      minPrice: $minPrice
+      maxPrice: $maxPrice
+      minBedrooms: $minBedrooms
+      maxBedrooms: $maxBedrooms
+      minArea: $minArea
       maxArea: $maxArea
     ) {
       id
@@ -29,6 +28,7 @@ const LISTINGS_QUERY = gql`
       bedrooms
       area
       shortDescription
+      saleOrRent
       images
     }
   }
@@ -45,103 +45,82 @@ const Listings = () => {
     maxArea: ''
   });
 
-  const [triggerSearch, setTriggerSearch] = useState(false);
+  const [getListings, { loading, error, data }] = useLazyQuery(LISTINGS_QUERY);
 
-  // Lazy query to be executed on form submit
-  const [fetchListings, { loading, error, data }] = useLazyQuery(LISTINGS_QUERY, {
-    variables: {
-      saleOrRent: filters.saleOrRent || null,
-      minPrice: filters.minPrice ? parseFloat(filters.minPrice) : null,
-      maxPrice: filters.maxPrice ? parseFloat(filters.maxPrice) : null,
-      minBedrooms: filters.minBedrooms ? parseInt(filters.minBedrooms) : null,
-      maxBedrooms: filters.maxBedrooms ? parseInt(filters.maxBedrooms) : null,
-      minArea: filters.minArea ? parseFloat(filters.minArea) : null,
-      maxArea: filters.maxArea ? parseFloat(filters.maxArea) : null
-    },
-  });
-
-  useEffect(() => {
-    if (triggerSearch) {
-      fetchListings();
-      setTriggerSearch(false);
-    }
-  }, [triggerSearch, fetchListings]);
-
-  // Handle filter change
-  const handleFilterChange = (e) => {
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFilters({ ...filters, [name]: value });
+    setFilters({
+      ...filters,
+      [name]: value
+    });
   };
 
-  // Handle form submit
-  const handleSearch = (e) => {
-    e.preventDefault();
-    setTriggerSearch(true);
+  const handleSearch = () => {
+    const variables = {
+      saleOrRent: filters.saleOrRent,
+      minPrice: filters.minPrice ? parseFloat(filters.minPrice) : undefined,
+      maxPrice: filters.maxPrice ? parseFloat(filters.maxPrice) : undefined,
+      minBedrooms: filters.minBedrooms ? parseInt(filters.minBedrooms, 10) : undefined,
+      maxBedrooms: filters.maxBedrooms ? parseInt(filters.maxBedrooms, 10) : undefined,
+      minArea: filters.minArea ? parseFloat(filters.minArea) : undefined,
+      maxArea: filters.maxArea ? parseFloat(filters.maxArea) : undefined,
+    };
+    getListings({ variables });
   };
-
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error.message}</p>;
 
   return (
     <Layout>
       <h1>Listings</h1>
-      
-      {/* Filter Form */}
-      <form onSubmit={handleSearch}>
+      <div>
         <label>
           Sale or Rent:
-          <select name="saleOrRent" value={filters.saleOrRent} onChange={handleFilterChange}>
-            <option value="">All</option>
-            <option value="sale">For Sale</option>
-            <option value="rent">For Rent</option>
+          <select name="saleOrRent" value={filters.saleOrRent} onChange={handleInputChange}>
+            <option value="">Any</option>
+            <option value="sale">Sale</option>
+            <option value="rent">Rent</option>
           </select>
         </label>
-        <br />
         <label>
           Min Price:
-          <input type="number" name="minPrice" value={filters.minPrice} onChange={handleFilterChange} />
+          <input type="number" name="minPrice" value={filters.minPrice} onChange={handleInputChange} />
         </label>
-        <br />
         <label>
           Max Price:
-          <input type="number" name="maxPrice" value={filters.maxPrice} onChange={handleFilterChange} />
+          <input type="number" name="maxPrice" value={filters.maxPrice} onChange={handleInputChange} />
         </label>
-        <br />
         <label>
           Min Bedrooms:
-          <input type="number" name="minBedrooms" value={filters.minBedrooms} onChange={handleFilterChange} />
+          <input type="number" name="minBedrooms" value={filters.minBedrooms} onChange={handleInputChange} />
         </label>
-        <br />
         <label>
           Max Bedrooms:
-          <input type="number" name="maxBedrooms" value={filters.maxBedrooms} onChange={handleFilterChange} />
+          <input type="number" name="maxBedrooms" value={filters.maxBedrooms} onChange={handleInputChange} />
         </label>
-        <br />
         <label>
-          Min Area (sq ft):
-          <input type="number" name="minArea" value={filters.minArea} onChange={handleFilterChange} />
+          Min Area:
+          <input type="number" name="minArea" value={filters.minArea} onChange={handleInputChange} />
         </label>
-        <br />
         <label>
-          Max Area (sq ft):
-          <input type="number" name="maxArea" value={filters.maxArea} onChange={handleFilterChange} />
+          Max Area:
+          <input type="number" name="maxArea" value={filters.maxArea} onChange={handleInputChange} />
         </label>
-        <br />
-        <button type="submit">Search</button>
-      </form>
-
-      <div>
-        {data && data.listings.map((listing) => (
-          <div key={listing.id}>
-            <h2>{listing.shortTitle}</h2>
-            <p>{listing.shortDescription}</p>
-            <p>Price: {listing.price}</p>
-            <p>Bedrooms: {listing.bedrooms}</p>
-            <p>Area: {listing.area} sq ft</p>
-            {/* Add more listing details as needed */}
-          </div>
-        ))}
+        <button onClick={handleSearch}>Search</button>
       </div>
+      {loading && <p>Loading...</p>}
+      {error && <p>Error: {error.message}</p>}
+      {data && (
+        <div>
+          {data.listings.map((listing) => (
+            <div key={listing.id}>
+              <h2>{listing.shortTitle}</h2>
+              <p>Price: {listing.price}</p>
+              <p>Bedrooms: {listing.bedrooms}</p>
+              <p>Area: {listing.area} sq ft</p>
+              <p>{listing.shortDescription}</p>
+            </div>
+          ))}
+        </div>
+      )}
     </Layout>
   );
 };

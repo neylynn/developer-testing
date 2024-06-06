@@ -1,9 +1,24 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
+
 ## Getting Started
+need to run npm install in root folder
+```bash
+npm install
+```
+Run docker compose
 
-First, run the development server:
+```bash
+docker-compose up --build
+```
 
+## Development
+
+need to run fake data 
+```bash
+node generateProperties.js
+```
+then, run developement server
 ```bash
 npm run dev
 # or
@@ -14,7 +29,9 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000/listings](http://localhost:3000/listings) with your browser to see the result.
+
+Open [http://localhost:3000/api/graphql](http://localhost:3000/api/graphql) with your browser to see the result for graphql interface.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
