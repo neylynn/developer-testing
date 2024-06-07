@@ -6,20 +6,23 @@ need to run npm install in root folder
 ```bash
 npm install
 ```
-Run docker compose
 
-```bash
+## Update database credentials
+update database name, host, username, and password in 'docker-compose.yml', 'Dockerfile.mysql', and 'server/db.js' files.
+
+
+## Run docker compose
 docker engine is up and running in your OS
+```bash
 docker-compose up --build
 ```
 
-## Development
-
-need to run fake data 
+## Run fake datas 
 ```bash
 node generateProperties.js
 ```
-then, run developement server
+
+## Run developement server
 ```bash
 npm run dev
 # or
