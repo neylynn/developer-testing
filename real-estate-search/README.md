@@ -9,6 +9,7 @@ npm install
 Run docker compose
 
 ```bash
+docker engine is up and running in your OS
 docker-compose up --build
 ```
 

@@ -1,5 +1,3 @@
-// resolvers.js
-
 const resolvers = {
     Query: {
       listings: async (_, { saleOrRent, minPrice, maxPrice, minBedrooms, maxBedrooms, minArea, maxArea }, { dataSources }) => {
