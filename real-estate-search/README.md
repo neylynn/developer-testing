@@ -1,5 +1,9 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
+## System Requirements
+require node v20.11.0 && ^
+require npm v10.8.1 && ^
+
 
 ## Getting Started
 need to run npm install in root folder
