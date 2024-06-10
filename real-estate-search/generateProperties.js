@@ -13,12 +13,12 @@ const generateProperties = (num) => {
       area: faker.number.int({ min: 500, max: 5000 }),
       shortDescription: faker.lorem.sentence(),
       saleOrRent: faker.helpers.arrayElement(['sale', 'rent']),
-      images: [faker.image.url(), faker.image.url()]
+      images: [faker.image.url(), faker.image.url(),faker.image.url(), faker.image.url(),faker.image.url()],
     });
   }
   return properties;
 };
 
-const properties = generateProperties(100); // Generate 1,000,000 properties
+const properties = generateProperties(100000); // Generate 1,000,000 properties
 fs.writeFileSync('data/properties.json', JSON.stringify(properties));
 console.log('Properties generated and saved to data/properties.json');
