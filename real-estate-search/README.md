@@ -6,8 +6,10 @@ require npm v10.8.1 && ^
 
 
 ## Getting Started
+pull the latest code form main branch
 need to run npm install in root folder
 ```bash
+git pull origin main &&
 npm install
 ```
 
